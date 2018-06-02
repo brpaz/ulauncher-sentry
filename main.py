@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 SENTRY_URL = "https://sentry.io"
 API_ENDPOINT = "https://sentry.io/api/0"
 
-class HashExtension(Extension):
+class SentryExtension(Extension):
 
     def __init__(self):
         logger.info('init sentry Extension')
-        super(HashExtension, self).__init__()
+        super(SentryExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
 
 class KeywordQueryEventListener(EventListener):
@@ -62,4 +62,4 @@ class KeywordQueryEventListener(EventListener):
         return RenderResultListAction(items)
 
 if __name__ == '__main__':
-   HashExtension().run()
+   SentryExtension().run()

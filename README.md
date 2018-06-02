@@ -6,7 +6,6 @@
 
 ![demo](demo.gif)
 
-
 ## Requirements
 
 * [ulauncher](https://ulauncher.io/)

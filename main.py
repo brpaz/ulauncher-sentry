@@ -1,64 +1,60 @@
 import logging
-import requests
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
 from ulauncher.api.shared.event import KeywordQueryEvent
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
-from ulauncher.api.shared.action.CopyToClipboardAction import CopyToClipboardAction
 from ulauncher.api.shared.action.DoNothingAction import DoNothingAction
 from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
 from ulauncher.api.shared.action.OpenUrlAction import OpenUrlAction
+from sentry import SentryClient, AuthenticationException, GenericException
 
 logger = logging.getLogger(__name__)
-
-SENTRY_URL = "https://sentry.io"
-API_ENDPOINT = "https://sentry.io/api/0"
 
 class SentryExtension(Extension):
 
     def __init__(self):
-        logger.info('init sentry Extension')
+        logger.info('init Sentry Extension')
         super(SentryExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
+        # TODO find a way to get preferences here.
+        self.sentryClient = SentryClient("", logger)
+
+    def buildResultsList(self, projects):
+        items = []
+        for project in projects:
+            url = "%s/%s/%s" % (self.sentryClient.SENTRY_URL, project['organization']
+                                    ['slug'], project['slug'])
+            items.append(ExtensionResultItem(icon='images/icon.png',
+                                                 name=project["name"],
+                                                 description=project['organization']['name'],
+                                                 on_enter=OpenUrlAction(
+                                                     url)
+                                                ))
+        return items
 
 class KeywordQueryEventListener(EventListener):
 
     def on_event(self, event, extension):
         items = []
    
-        authToken = extension.preferences['auth_token']
+        try:
+            extension.sentryClient.setAuthToken(extension.preferences['auth_token'])
+            projects = extension.sentryClient.getProjects(event.get_argument())
 
-        headers = {"Authorization": "Bearer {}".format(authToken)}
-        r = requests.get('https://sentry.io/api/0/projects/', headers=headers)
+            items = extension.buildResultsList(projects)
 
-        if not r.ok:
-            if r.status_code == 401:
-                items.append(ExtensionResultItem(icon='images/icon.png',
-                                                  name="401 - Unauthorized",
-                                                  description="Please check Extension settings and confirm your 'auth_token' is correct",
-                                                  highlightable=False,
-                                                  on_enter=HideWindowAction()))
-            
-            else:
-                items.append(ExtensionResultItem(icon='images/icon.png',
-                                                  name="Unexpected Error " + r.status_code,
-                                                  highlightable=False,
-                                                  on_enter=HideWindowAction()))
-            return RenderResultListAction(items)
-                
-        projects = r.json()
-
-        for project in projects:
-            url = "%s/%s/%s" % (SENTRY_URL, project['organization']
-                                ['slug'], project['slug'])
+        except AuthenticationException as e:
             items.append(ExtensionResultItem(icon='images/icon.png',
-                                             name=project["name"],
-                                             description=project['organization']['name'],
-                                             on_enter=OpenUrlAction(
-                                                 url)
+                                             name="Authentication failed",
+                                             description="Please check the 'auth token' value on extension preferences",
+                                             on_enter=HideWindowAction()
                                              ))
-
+        except GenericException as e:
+            items.append(ExtensionResultItem(icon='images/icon.png',
+                                             name="Error fetching information from Sentry",
+                                             on_enter=HideWindowAction()
+                                             ))
         return RenderResultListAction(items)
 
 if __name__ == '__main__':

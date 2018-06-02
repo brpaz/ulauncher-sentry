@@ -1,0 +1,26 @@
+{
+    "manifest_version": "1",
+    "api_version": "1",
+    "name": "Sentry",
+    "description": "Easy access your sentry.io projects",
+    "developer_name": "Bruno Paz",
+    "icon": "images/icon.png",
+    "options": {
+        "query_debounce": 0.05
+    },
+    "preferences": [
+        {
+            "id": "kw",
+            "type": "keyword",
+            "name": "Keyword",
+            "default_value": "sentry"
+        },
+        {
+            "id": "auth_token",
+            "type": "input",
+            "name": "Auth Token",
+            "description": "The auth token required to access Sentry API. Get one from <a href=\"https://sentry.io/settings/account/api/auth-tokens/\">here</a>",
+            "default_value": ""
+        }
+    ]
+}

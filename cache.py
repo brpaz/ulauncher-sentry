@@ -1,5 +1,6 @@
 import time
 
+
 class Cache:
 
     _cache_ = {}

@@ -9,8 +9,14 @@
 ## Requirements
 
 * [ulauncher](https://ulauncher.io/)
-* Python >= 2.7
+* Python >= 3
 * A [Sentry](https://sentry.io) account.
+
+Python `requests` package. You can installed it by running:
+
+```bash
+pip install requests --user
+```
 
 ## Install
 
@@ -22,7 +28,7 @@ Open ulauncher preferences window -> extensions -> add extension and paste the f
 
 * Before usage you need to configure your Sentry "auth_token" in plugin preferences.
 * The results from the Sentry API are cached by 1h.
- 
+
 ## Development
 
 ```
@@ -33,6 +39,6 @@ ln -s <repo_location> ulauncher-sentry
 
 To see your changes, stop ulauncher and run it from the command line with: ```ulauncher -v```.
 
-## License 
+## License
 
 MIT

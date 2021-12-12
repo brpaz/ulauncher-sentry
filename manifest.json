@@ -1,6 +1,5 @@
 {
-    "manifest_version": "1",
-    "api_version": "1",
+    "required_api_version": "^2.0.0",
     "name": "Sentry",
     "description": "Easy access your sentry.io projects",
     "developer_name": "Bruno Paz",

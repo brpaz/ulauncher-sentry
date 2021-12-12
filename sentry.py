@@ -1,13 +1,14 @@
 import requests
 from cache import Cache
 
+
 class SentryClient:
 
     SENTRY_URL = "https://sentry.io"
 
     API_BASE_URL = "https://sentry.io/api/0"
 
-    CACHE_TTL = 3600 # 1h
+    CACHE_TTL = 3600  # 1h
 
     CACHE_KEY = "sentry_projects"
 
@@ -30,7 +31,7 @@ class SentryClient:
                 filteredProjects.append(project)
 
         return filteredProjects
-    
+
     def getProjects(self, filter=None):
         self.logger.debug("getting projects from sentry")
 
@@ -44,10 +45,11 @@ class SentryClient:
         if not r.ok:
             if r.status_code == 401:
                 raise AuthenticationException(
-                    "Failed to authenticate with access token " + self.authToken)
+                    "Failed to authenticate with access token " +
+                    self.authToken)
 
-            raise GenericException(
-                "Error connecting to Sentry API : status " + r.status_code)
+            raise GenericException("Error connecting to Sentry API : status " +
+                                   r.status_code)
 
         data = r.json()
 
@@ -55,8 +57,10 @@ class SentryClient:
 
         return self.filterResults(data, filter)
 
+
 class GenericException(Exception):
-      pass 
+    pass
+
 
 class AuthenticationException(Exception):
     pass
